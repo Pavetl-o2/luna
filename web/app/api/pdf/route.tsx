@@ -55,7 +55,15 @@ export async function POST(req: NextRequest) {
 
     const fileName = buildFileName(chart.summary.name ?? "lectura");
 
-    return new Response(pdfBuffer, {
+    // Buffer extiende Uint8Array; lo envolvemos explícitamente para
+    // que TypeScript lo acepte como BodyInit.
+    const body = new Uint8Array(
+      pdfBuffer.buffer,
+      pdfBuffer.byteOffset,
+      pdfBuffer.byteLength
+    );
+
+    return new Response(body, {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",
