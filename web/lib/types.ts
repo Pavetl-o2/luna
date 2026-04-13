@@ -13,7 +13,6 @@ export interface GeocodeResult {
   lng: number;
   display_name: string;
   country_code: string; // ISO-3166 alpha-2, e.g. "ES"
-  tz_str: string; // e.g. "Europe/Madrid"
 }
 
 export interface ChartPlanet {

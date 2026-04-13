@@ -2,11 +2,11 @@ import type { GeocodeResult } from "./types";
 
 /**
  * Geocodifica una ciudad usando Nominatim (OpenStreetMap).
- * Nominatim es gratis y no necesita API key, pero la ToS exige un User-Agent
- * identificable. Lo pasamos desde el navegador vía header (limitación: en
- * browsers no podemos forzar User-Agent, pero Nominatim acepta Referer).
+ * Nominatim es gratis y no necesita API key.
  *
- * Después enriquecemos con la timezone usando timeapi.io (también gratis).
+ * La timezone se resuelve en el servidor (api/chart.py) a partir de
+ * lat/lng usando la librería timezonefinder, que lleva los datos de
+ * zonas horarias embebidos y no requiere peticiones de red externas.
  */
 export async function geocodeCity(city: string): Promise<GeocodeResult> {
   if (!city.trim()) {
@@ -44,22 +44,5 @@ export async function geocodeCity(city: string): Promise<GeocodeResult> {
   const country_code = (first.address?.country_code || "").toUpperCase();
   const display_name = first.display_name;
 
-  // Obtener timezone a partir de coordenadas
-  const tzUrl = new URL("https://timeapi.io/api/TimeZone/coordinate");
-  tzUrl.searchParams.set("latitude", String(lat));
-  tzUrl.searchParams.set("longitude", String(lng));
-
-  const tzRes = await fetch(tzUrl.toString(), {
-    headers: { Accept: "application/json" },
-  });
-  if (!tzRes.ok) {
-    throw new Error("No se pudo determinar la zona horaria.");
-  }
-  const tzJson = (await tzRes.json()) as { timeZone?: string };
-  const tz_str = tzJson.timeZone;
-  if (!tz_str) {
-    throw new Error("El servicio de zona horaria no devolvió un valor válido.");
-  }
-
-  return { lat, lng, display_name, country_code, tz_str };
+  return { lat, lng, display_name, country_code };
 }

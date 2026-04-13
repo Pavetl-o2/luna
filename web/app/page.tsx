@@ -16,7 +16,8 @@ export default function HomePage() {
     setChart(null);
     setLoading(true);
     try {
-      // 1. Geocodificar la ciudad (lat/lng + timezone)
+      // 1. Geocodificar la ciudad (lat/lng). La timezone la resuelve
+      //    el backend a partir de lat/lng con timezonefinder.
       const geo = await geocodeCity(values.city);
 
       // 2. Separar fecha y hora
@@ -36,7 +37,6 @@ export default function HomePage() {
           minute,
           lat: geo.lat,
           lng: geo.lng,
-          tz_str: geo.tz_str,
           city: geo.display_name,
           nation: geo.country_code,
           gender: values.gender,

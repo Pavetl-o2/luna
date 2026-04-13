@@ -31,6 +31,28 @@ import os
 import tempfile
 import traceback
 
+# TimezoneFinder es pesado de instanciar; lo hacemos una sola vez
+# a nivel de módulo para que el lambda warm lo reutilice.
+_tf_instance = None
+
+
+def _get_timezone_finder():
+    global _tf_instance
+    if _tf_instance is None:
+        from timezonefinder import TimezoneFinder
+        _tf_instance = TimezoneFinder()
+    return _tf_instance
+
+
+def _resolve_timezone(lat: float, lng: float) -> str:
+    tf = _get_timezone_finder()
+    tz = tf.timezone_at(lat=lat, lng=lng)
+    if not tz:
+        # Fallback defensivo: si el punto cae en aguas internacionales
+        # o en una zona sin cobertura, usamos UTC.
+        tz = "UTC"
+    return tz
+
 
 def _safe_get(obj, key, default=None):
     """Acceso tolerante: soporta tanto dicts como objetos Kerykeion."""
@@ -175,11 +197,18 @@ class handler(BaseHTTPRequestHandler):
             raw = self.rfile.read(length) if length else b"{}"
             data = json.loads(raw.decode("utf-8"))
 
-            # Validación básica
-            required = ["name", "year", "month", "day", "hour", "minute", "lat", "lng", "tz_str"]
+            # Validación básica (tz_str es opcional: si no viene, lo derivamos
+            # del par lat/lng con timezonefinder)
+            required = ["name", "year", "month", "day", "hour", "minute", "lat", "lng"]
             missing = [k for k in required if k not in data]
             if missing:
                 return self._send_json(400, {"error": f"Faltan campos: {', '.join(missing)}"})
+
+            lat = float(data["lat"])
+            lng = float(data["lng"])
+            tz_str = data.get("tz_str")
+            if not tz_str:
+                tz_str = _resolve_timezone(lat, lng)
 
             from kerykeion import AstrologicalSubject
 
@@ -190,9 +219,9 @@ class handler(BaseHTTPRequestHandler):
                 day=int(data["day"]),
                 hour=int(data["hour"]),
                 minute=int(data["minute"]),
-                lat=float(data["lat"]),
-                lng=float(data["lng"]),
-                tz_str=str(data["tz_str"]),
+                lat=lat,
+                lng=lng,
+                tz_str=str(tz_str),
                 city=str(data.get("city") or "Unknown"),
                 nation=str(data.get("nation") or "XX"),
                 online=False,
