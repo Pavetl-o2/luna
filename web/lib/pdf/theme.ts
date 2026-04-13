@@ -22,8 +22,12 @@ export const theme = {
     italic: "Helvetica-Oblique",
     boldItalic: "Helvetica-BoldOblique",
     // Para un look más editorial usamos Times en los títulos grandes.
+    // Nota: react-pdf resuelve la variante italic a partir de "Times-Roman"
+    // + fontStyle:"italic". Usar "Times-Italic" como fontFamily genera
+    // "Could not resolve font for Times-Italic, fontStyle italic".
+    serif: "Times-Roman",
     serifBold: "Times-Bold",
-    serifItalic: "Times-Italic",
+    serifItalic: "Times-Roman",
   },
   sizes: {
     body: 10.5,

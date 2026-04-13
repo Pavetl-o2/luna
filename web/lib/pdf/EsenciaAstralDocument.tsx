@@ -208,6 +208,7 @@ const styles = StyleSheet.create({
   },
   coverName: {
     fontFamily: theme.fonts.serifItalic,
+    fontStyle: "italic",
     fontSize: 14,
     color: c.textSubtle,
     textAlign: "center",
