@@ -34,6 +34,7 @@ export interface ChartResponse {
     moon: ChartPlanet | null;
     ascendant: ChartPlanet | null;
     midheaven: ChartPlanet | null;
+    dominant_element: string | null;
   };
   planets: Record<string, ChartPlanet>;
   houses: Record<string, ChartPlanet>;

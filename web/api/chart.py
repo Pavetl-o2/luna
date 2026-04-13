@@ -79,6 +79,47 @@ def _planet_to_dict(p):
     }
 
 
+# Mapeo de signos a elementos, por si Kerykeion no lo expone directamente
+_SIGN_TO_ELEMENT = {
+    "Ari": "Fire", "Leo": "Fire", "Sag": "Fire",
+    "Tau": "Earth", "Vir": "Earth", "Cap": "Earth",
+    "Gem": "Air", "Lib": "Air", "Aqu": "Air",
+    "Can": "Water", "Sco": "Water", "Pis": "Water",
+    "Aries": "Fire", "Sagittarius": "Fire",
+    "Taurus": "Earth", "Virgo": "Earth", "Capricorn": "Earth",
+    "Gemini": "Air", "Libra": "Air", "Aquarius": "Air",
+    "Cancer": "Water", "Scorpio": "Water", "Pisces": "Water",
+}
+
+_ELEMENT_ES = {
+    "Fire": "Fuego",
+    "Earth": "Tierra",
+    "Air": "Aire",
+    "Water": "Agua",
+}
+
+
+def _compute_dominant_element(planets):
+    """Cuenta los planetas personales por elemento y devuelve el dominante en español."""
+    counts = {"Fire": 0, "Earth": 0, "Air": 0, "Water": 0}
+    personal = ["sun", "moon", "mercury", "venus", "mars", "jupiter", "saturn"]
+    for key in personal:
+        p = planets.get(key)
+        if not p:
+            continue
+        element = p.get("element")
+        if element not in counts:
+            # Fallback: mapear desde el signo
+            sign = p.get("sign") or ""
+            element = _SIGN_TO_ELEMENT.get(sign) or _SIGN_TO_ELEMENT.get(sign[:3])
+        if element in counts:
+            counts[element] += 1
+    if not any(counts.values()):
+        return None
+    dominant = max(counts, key=counts.get)
+    return _ELEMENT_ES.get(dominant, dominant)
+
+
 def _extract_chart_data(subject):
     """Extrae los datos relevantes del AstrologicalSubject de Kerykeion."""
 
@@ -107,16 +148,13 @@ def _extract_chart_data(subject):
             if val is not None:
                 houses[attr] = _planet_to_dict(val)
 
-    # Puntos principales para el resumen
-    asc = planets.get("first_house") or houses.get("first_house")
-    mc = planets.get("tenth_house") or houses.get("tenth_house")
-
     summary = {
         "name": getattr(subject, "name", None),
         "sun": planets.get("sun"),
         "moon": planets.get("moon"),
         "ascendant": houses.get("first_house"),
         "midheaven": houses.get("tenth_house"),
+        "dominant_element": _compute_dominant_element(planets),
     }
 
     return {
