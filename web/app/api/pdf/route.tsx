@@ -55,15 +55,13 @@ export async function POST(req: NextRequest) {
 
     const fileName = buildFileName(chart.summary.name ?? "lectura");
 
-    // Buffer extiende Uint8Array; lo envolvemos explícitamente para
-    // que TypeScript lo acepte como BodyInit.
-    const body = new Uint8Array(
-      pdfBuffer.buffer,
-      pdfBuffer.byteOffset,
-      pdfBuffer.byteLength
-    );
+    // Copiamos el Buffer a un ArrayBuffer nativo sin genéricos para
+    // satisfacer el BodyInit del Response en TS 5.7 + @types/node 22.
+    // Coste: una única copia de ~200-400 KB, imperceptible.
+    const arrayBuffer = new ArrayBuffer(pdfBuffer.byteLength);
+    new Uint8Array(arrayBuffer).set(pdfBuffer);
 
-    return new Response(body, {
+    return new Response(arrayBuffer, {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",
