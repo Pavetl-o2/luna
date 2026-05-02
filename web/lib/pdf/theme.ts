@@ -1,30 +1,31 @@
 /**
- * Paleta y medidas del tema "Esencia Astral".
- * Inspirado en la plantilla editorial cálida, limpia y mística elegante.
+ * Paleta y medidas del tema "Luna Estelar".
+ * Diseño oscuro, cósmico y elegante — navy + oro cálido.
+ * Paleta: Fondo #1E2742 · Acento #D9C18A · Texto #F7F1E8
  */
 export const theme = {
   colors: {
-    background: "#F6F2EA",
-    cardBackground: "#FDFBF7",
-    text: "#2A2A2A",
-    textMuted: "#8A8A8A",
-    textSubtle: "#6B6B6B",
-    accent: "#A97A4B", // marrón dorado
-    accentSoft: "#C9A474",
-    cardBorder: "#DCD0BF",
-    circleDecoration: "#E8D9C0",
-    divider: "#A97A4B",
+    background: "#1E2742",
+    cardBackground: "#283656",
+    innerCardBg: "#1E2742",
+    text: "#F7F1E8",
+    textMuted: "#9BA3B7",
+    textSubtle: "#C0C5D0",
+    accent: "#D9C18A",
+    accentSoft: "#C4AD76",
+    headerBar: "#D9C18A",
+    headerBarText: "#1E2742",
+    cardBorder: "#3A4A6B",
+    pageBorder: "#4A5A7B",
+    divider: "#D9C18A",
+    pillBg: "#D9C18A",
+    pillText: "#1E2742",
   },
-  // React-pdf solo dispone de Courier, Helvetica y Times out of the box.
   fonts: {
     body: "Helvetica",
     bold: "Helvetica-Bold",
     italic: "Helvetica-Oblique",
     boldItalic: "Helvetica-BoldOblique",
-    // Para un look más editorial usamos Times en los títulos grandes.
-    // Nota: react-pdf resuelve la variante italic a partir de "Times-Roman"
-    // + fontStyle:"italic". Usar "Times-Italic" como fontFamily genera
-    // "Could not resolve font for Times-Italic, fontStyle italic".
     serif: "Times-Roman",
     serifBold: "Times-Bold",
     serifItalic: "Times-Roman",
@@ -34,12 +35,12 @@ export const theme = {
     caption: 9,
     footerText: 8,
     label: 9,
-    h1: 26,
+    h1: 24,
     h2: 18,
     h3: 12,
   },
   spacing: {
-    pagePadding: 50,
+    pagePadding: 40,
   },
 } as const;
 

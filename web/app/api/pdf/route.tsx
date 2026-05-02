@@ -99,8 +99,8 @@ function buildFileName(name: string): string {
 function svgToPngDataUrl(svg: string): string {
   if (!svg) return "";
   try {
-    const resvg = new Resvg(svg, {
-      background: "rgba(255,255,255,1)",
+    const processed = preprocessSvg(svg);
+    const resvg = new Resvg(processed, {
       fitTo: { mode: "width", value: 900 },
     });
     const pngData = resvg.render().asPng();
@@ -110,6 +110,25 @@ function svgToPngDataUrl(svg: string): string {
     console.error("[svgToPngDataUrl] Failed to convert SVG:", err);
     return "";
   }
+}
+
+function preprocessSvg(svg: string): string {
+  // Kerykeion SVGs may lack an explicit background, causing resvg to
+  // render a transparent (appears black) image. Inject a white rect
+  // right after the opening <svg> tag so the background is always
+  // opaque. Also ensure width/height are set when only viewBox exists.
+  let s = svg.replace(
+    /(<svg\b[^>]*>)/i,
+    '$1<rect width="100%" height="100%" fill="white" />'
+  );
+
+  // If the <svg> has a viewBox but no explicit width/height, add them
+  // so resvg can determine the render size.
+  if (/viewBox=/i.test(s) && !/\bwidth=/i.test(s.slice(0, s.indexOf(">")))) {
+    s = s.replace(/(<svg\b)/i, '$1 width="800" height="800"');
+  }
+
+  return s;
 }
 
 async function generateReading(
