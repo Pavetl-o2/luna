@@ -32,6 +32,30 @@ function SummaryCard({
   );
 }
 
+function svgToPngDataUrl(svgString: string): Promise<string> {
+  return new Promise((resolve) => {
+    const blob = new Blob([svgString], { type: "image/svg+xml" });
+    const url = URL.createObjectURL(blob);
+    const img = new window.Image();
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = 900;
+      canvas.height = 900;
+      const ctx = canvas.getContext("2d")!;
+      ctx.fillStyle = "white";
+      ctx.fillRect(0, 0, 900, 900);
+      ctx.drawImage(img, 0, 0, 900, 900);
+      URL.revokeObjectURL(url);
+      resolve(canvas.toDataURL("image/png"));
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      resolve("");
+    };
+    img.src = url;
+  });
+}
+
 export default function ChartDisplay({ chart }: Props) {
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -40,10 +64,14 @@ export default function ChartDisplay({ chart }: Props) {
     setError(null);
     setGenerating(true);
     try {
+      const chartImageDataUrl = chart.svg
+        ? await svgToPngDataUrl(chart.svg)
+        : "";
+
       const res = await fetch("/api/pdf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ chart }),
+        body: JSON.stringify({ chart, chartImageDataUrl }),
       });
 
       if (!res.ok) {

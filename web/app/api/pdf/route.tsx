@@ -28,7 +28,10 @@ export const maxDuration = 60;
  */
 export async function POST(req: NextRequest) {
   try {
-    const { chart } = (await req.json()) as { chart: ChartResponse };
+    const { chart, chartImageDataUrl } = (await req.json()) as {
+      chart: ChartResponse;
+      chartImageDataUrl?: string;
+    };
     if (!chart) {
       return json({ error: "Falta el campo 'chart' en el body." }, 400);
     }
@@ -41,8 +44,9 @@ export async function POST(req: NextRequest) {
     // 1. Generar el reading estructurado con el LLM
     const reading = await generateReading(chart, apiKey);
 
-    // 2. Convertir SVG → PNG data URL
-    const chartImage = svgToPngDataUrl(chart.svg);
+    // 2. Usar la imagen del cliente (canvas) si la envió, si no intentar
+    //    conversión server-side con resvg como fallback.
+    const chartImage = chartImageDataUrl || svgToPngDataUrl(chart.svg);
 
     // 3. Renderizar el PDF
     const pdfBuffer = await renderToBuffer(

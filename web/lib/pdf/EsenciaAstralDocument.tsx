@@ -465,12 +465,6 @@ function BigThreePage({
           />
         </View>
       </View>
-
-      <View style={base.pill}>
-        <Text style={base.pillText}>
-          La triada Sol-Luna-Ascendente define tu esencia más profunda.
-        </Text>
-      </View>
     </InteriorPage>
   );
 }
@@ -490,21 +484,28 @@ function BigThreeColumn({
     <View style={{ flex: 1, alignItems: "center" }}>
       <PlanetBadge abbr={abbr} label={label} />
       <View style={[base.innerCard, { alignSelf: "stretch" }]}>
-        <Text style={{ ...base.label, textAlign: "center", marginBottom: 6 }}>
+        <Text
+          style={{
+            fontSize: 8,
+            color: c.textMuted,
+            textAlign: "center",
+            marginBottom: 4,
+          }}
+        >
           En {sign}
         </Text>
-        <Text style={{ ...base.cardTitle, fontSize: s.body }}>Qué muestra</Text>
-        <Text style={base.cardBody}>{reading.whatItShows}</Text>
-        <Text
-          style={{ ...base.cardTitle, fontSize: s.body, marginTop: 8 }}
-        >
-          Claves
+        <Text style={{ fontSize: 8.5, lineHeight: 1.4, color: c.text }}>
+          {reading.whatItShows}
         </Text>
-        {reading.keywords.map((kw, i) => (
-          <Text key={i} style={{ fontSize: s.caption, color: c.textMuted }}>
-            · {kw}
-          </Text>
-        ))}
+        <Text
+          style={{
+            fontSize: 7.5,
+            color: c.accent,
+            marginTop: 6,
+          }}
+        >
+          {reading.keywords.join(" · ")}
+        </Text>
       </View>
     </View>
   );
